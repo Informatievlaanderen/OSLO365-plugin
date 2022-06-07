@@ -1,14 +1,11 @@
 <template>
   <vl-content-footer id="content-footer">
     <vl-layout>
-      <vl-grid class="vl-grid--v-center">
-        <vl-column width="6">
-          <vl-button mod-block @click="insertNote('footnote')">Voetnoot</vl-button>
-        </vl-column>
-        <vl-column width="6">
-          <vl-button mod-block @click="insertNote('endnote')">Eindnoot</vl-button>
-        </vl-column>
-      </vl-grid>
+      Invoegen als
+      <vl-select mod-small>
+        <option value="footnote">Voetnoot</option>
+        <option value="endnote">Eindnoot</option>
+      </vl-select>
     </vl-layout>
   </vl-content-footer>
 </template>

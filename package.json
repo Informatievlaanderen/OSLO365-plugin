@@ -35,6 +35,7 @@
     "@govflanders/vl-ui-pill": "^11.0.0",
     "@govflanders/vl-ui-radio": "^11.0.0",
     "@govflanders/vl-ui-radio-tile": "^11.0.0",
+    "@govflanders/vl-ui-select": "^13.0.9",
     "@govflanders/vl-ui-titles": "^11.0.0",
     "@govflanders/vl-ui-util": "^11.0.0",
     "@govflanders/vl-ui-vue-components": "^12.0.0",

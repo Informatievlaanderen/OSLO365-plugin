@@ -1,6 +1,7 @@
 <template>
   <div>
     <vl-layout>
+      <vl-title tag-name="h2"> Vraag het aan OSLO: </vl-title>
       <vl-grid mod-stacked>
         <vl-column>
           <vl-input-field
@@ -8,8 +9,11 @@
             mod-block
             v-model="input"
             @input="askOslo"
-            placeholder="Vraag het aan OSLO"
+            placeholder="Geef minstens 3 letters in"
           />
+        </vl-column>
+        <vl-column v-if="result.length > 0">
+          <p>{{ result.length }} resultaten gevonden</p>
         </vl-column>
         <vl-column id="ResultBox" v-if="result.length > 0">
           <transition-group appear name="slide-fade">
@@ -52,6 +56,10 @@ export default Vue.extend({
     askOslo() {
       if (this.input.length > 2) {
         search(this.input);
+      } else {
+        // When someone is removing characters and the string has a length lesser than or equal to 2
+        // We reset the array
+        this.result = [];
       }
     }
   },
