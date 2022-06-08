@@ -19,7 +19,7 @@ Vue.use(VlUiVueComponents, {
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
-    var app = new Vue({
+    new Vue({
       el: "#app",
       render: (h) => h(root),
     });
@@ -31,7 +31,7 @@ Office.onReady((info) => {
 
 export async function searchDocument() {
   return await Word.run(async (context) => {
-    const wordsWithMatches: Word.Range[] = [];
+    const wordWithRangesMap = new Map<string, Word.Range[]>();
 
     const range = context.document.body.getRange();
     range.load();
@@ -72,7 +72,10 @@ export async function searchDocument() {
 
       for (let word of wordList) {
         if (osloInstance.osloLookup(word.text, false).length > 0) {
-          wordsWithMatches.push(word);
+          if (!wordWithRangesMap.has(word.text)) {
+            wordWithRangesMap.set(word.text, []);
+          }
+          wordWithRangesMap.set(word.text, [...wordWithRangesMap.get(word.text), word]);
         }
       }
 
@@ -82,12 +85,12 @@ export async function searchDocument() {
       await context.sync();
     }
 
-    return wordsWithMatches;
+    return wordWithRangesMap;
   });
 }
 
-export function getDefinitions(word: Word.Range): IOsloItem[] {
-  return OsloCache.getInstance().osloLookup(word.text, false);
+export function getDefinitions(word: string): IOsloItem[] {
+  return OsloCache.getInstance().osloLookup(word, false);
 }
 
 // This function expected the cursor to be at the beginning of the document
@@ -115,6 +118,83 @@ export function selectWordInDocument(word: Word.Range) {
 
       found = true;
       results.items[index].select();
+    }
+
+    await context.sync();
+  });
+}
+
+export function selectNextWordInDocument(nextWord: Word.Range) {
+  return Word.run(async (context) => {
+    const selection = context.document.getSelection();
+    selection.load();
+
+    const results = context.document.body.search(nextWord.text);
+    context.load(results);
+
+    await context.sync();
+
+    if (results.items.length === 1) {
+      results.items[0].select();
+    } else {
+      let found = false;
+      let index = 0;
+
+      while (index <= results.items.length && !found) {
+        const position = results.items[index].compareLocationWith(selection);
+        await context.sync();
+
+        if (position.value !== Word.LocationRelation.after && position.value !== Word.LocationRelation.adjacentAfter) {
+          index++;
+          continue;
+        }
+
+        found = true;
+        results.items[index].select();
+      }
+    }
+
+    await context.sync();
+  });
+}
+
+export function selectPreviousWordInDocument(previousWord: Word.Range) {
+  return Word.run(async (context) => {
+    const selection = context.document.getSelection();
+    selection.load();
+
+    const results = context.document.body.search(previousWord.text);
+    context.load(results);
+
+    await context.sync();
+
+    if (results.items.length === 1) {
+      results.items[0].select();
+    } else {
+      let currentSelection = 0;
+      let index = 1;
+      let found = false;
+      while (index <= results.items.length - 1 && !found) {
+        const position = results.items[index].compareLocationWith(selection);
+        await context.sync();
+
+        if (
+          position.value !== Word.LocationRelation.adjacentAfter &&
+          position.value !== Word.LocationRelation.after &&
+          position.value !== Word.LocationRelation.equal
+        ) {
+          currentSelection = index;
+          index++;
+          continue;
+        }
+
+        found = true;
+        results.items[currentSelection].select();
+      }
+
+      if (!found) {
+        results.items[index - 1].select();
+      }
     }
 
     await context.sync();
