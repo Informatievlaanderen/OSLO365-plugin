@@ -1,35 +1,84 @@
 import { AppConfig } from "../utils/AppConfig";
 import { IOsloBucketItem } from "./IOsloBucketItem";
-import { error, trace } from "../utils/Utils";
+import { error, getDayDifference, trace } from "../utils/Utils";
 import { IOsloItem } from "./IOsloItem";
+import localforage from "localforage";
+
+export enum DataLocation {
+  Local,
+  Backend,
+}
 
 // TODO: check if cache should be initialized once plugin is rendered or only when it is needed
 export class OsloCache {
   private static instance: OsloCache;
 
   /** Maps the first word of Oslo key phrases to buckets (arrays) of tuples of {full key phrase, number of words}. */
+  // FIXME: is this used?
   private osloLookupMap: Map<string, IOsloBucketItem[]>;
 
   /** Cache for Oslo data items */
-  private osloLookupEntries: IOsloItem[];
+  private _osloLookupEntries: IOsloItem[];
 
-  private constructor() {
-    this.initCache();
+  private constructor() { }
+
+  public get osloLookupEntries(): IOsloItem[] {
+    if (!this._osloLookupEntries) {
+      error("Oslo data was not yet set in cache.");
+    }
+
+    return this._osloLookupEntries;
   }
 
-  public static init(): void {
-    OsloCache.getInstance();
+  public set osloLookupEntries(value: IOsloItem[]) {
+    this._osloLookupEntries = value;
   }
 
-  public static getInstance(): OsloCache {
+  private static async build(): Promise<void> {
+    const updateTimestamp: string = await localforage.getItem("updateTimestamp");
+    let dataLocation: DataLocation;
+
+    if (updateTimestamp) {
+      const dayDifference = getDayDifference(updateTimestamp);
+
+      if (dayDifference >= 1) {
+        dataLocation = DataLocation.Backend;
+      } else {
+        dataLocation = DataLocation.Local;
+      }
+    } else {
+      dataLocation = DataLocation.Backend;
+    }
+
+    OsloCache.instance = new OsloCache();
+
+    if (dataLocation === DataLocation.Backend) {
+      OsloCache.instance.loadDataFromBackend();
+    } else {
+      await OsloCache.instance.loadLocalData();
+    }
+  }
+
+  public static async getInstance(): Promise<OsloCache> {
     if (!OsloCache.instance) {
-      OsloCache.instance = new OsloCache();
+      await OsloCache.build();
     }
 
     return OsloCache.instance;
   }
 
-  private initCache(): void {
+  private async loadLocalData(): Promise<void> {
+    const data: IOsloItem[] = await localforage.getItem("osloItems");
+
+    if (!data) {
+      // TODO: load data from backend
+      error("No OSLO data that could be loaded locally");
+    }
+
+    this.osloLookupEntries = data;
+  }
+
+  private loadDataFromBackend(): void {
     // The first cache is a simple list of Oslo result items
     // Load the data from the web server. We're assuming a simple GET without authentication.
     this.httpRequest("GET", AppConfig.dataFileUrl)
@@ -70,12 +119,14 @@ export class OsloCache {
 
         trace(
           "OSLO data cache initialized, " +
-            this.osloLookupEntries.length +
-            " items, " +
-            this.osloLookupMap.size +
-            " buckets"
+          this.osloLookupEntries.length +
+          " items, " +
+          this.osloLookupMap.size +
+          " buckets"
         );
-        //afterCacheInitialized();
+
+        localforage.setItem("updateTimestamp", new Date(Date.now()));
+        localforage.setItem("osloItems", this.osloLookupEntries);
       })
       .catch((error) => {
         trace("Error: " + error);
@@ -84,11 +135,11 @@ export class OsloCache {
 
   /** Asynchronously retrieves the string data response from the HTTP request for the given URL. */
   private async httpRequest(verb: "GET" | "PUT", url: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>((resolve) => {
       const request = new XMLHttpRequest();
 
       // Callback after request.send()
-      request.onload = function (event) {
+      request.onload = function () {
         if (request.status === 200) {
           // HTTP request successful, resolve the promise with the response body
           resolve(request.response);
@@ -128,7 +179,7 @@ export class OsloCache {
     return data;
   }
 
-  /** Looks up the given phrase in the OSLO database and returns the results via the given callback */
+  /** Looks up the given phrase in the OSLO database */
   public osloLookup(phrase: string, useExactMatching: boolean): IOsloItem[] {
     if (!phrase) {
       return null;

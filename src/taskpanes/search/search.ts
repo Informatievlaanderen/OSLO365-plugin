@@ -26,7 +26,6 @@ Office.onReady((info) => {
   }
 
   Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, onWordSelectionChanged);
-  OsloCache.init();
 });
 
 /** Called when the user selects something in the Word document */
@@ -66,7 +65,7 @@ function processSelection() {
 }
 
 /** Searches a given phrase in the OSLO data set. */
-export function search(searchPhrase: string) {
+export async function search(searchPhrase: string) {
   console.log(`Looking for "${searchPhrase}"`);
 
   if (!searchPhrase) {
@@ -81,10 +80,11 @@ export function search(searchPhrase: string) {
     searchPhrase = searchPhrase.slice(1);
   }
 
-  const osloCache = OsloCache.getInstance();
+  //const osloCache = await OsloCache.getInstance();
 
-  // Search the phrase in the OSLO database
-  const osloResult = osloCache.osloLookup(searchPhrase, exactMatch);
+  const osloResult = await OsloCache.getInstance().then((cache) => {
+    return cache.osloLookup(searchPhrase, exactMatch);
+  });
 
   EventBus.$emit("onSearchResult", osloResult);
 }

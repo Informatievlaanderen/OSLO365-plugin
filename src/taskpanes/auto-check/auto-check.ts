@@ -26,7 +26,7 @@ Office.onReady((info) => {
   }
 
   // TODO: Use VUEX Store, so that not every pane has to initialize it
-  OsloCache.init();
+  //OsloCache.init();
 });
 
 export async function searchDocument() {

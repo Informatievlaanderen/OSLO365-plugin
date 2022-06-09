@@ -1,22 +1,24 @@
 <template>
-  <vl-info-tile
-    style="word-break: break-word"
-    class="hvr-grow-shadow"
-    id="search-result"
-    tag-name="div"
-    :title="title"
-    :subtitle="showUrl === true ? url : ''"
-    v-vl-border
-  >
-    <vl-grid>
-      <vl-column>
-        <p>{{ description }}</p>
-      </vl-column>
-      <vl-column>
-        <vl-link id="addLink" v-vl-flex v-vl-flex:align-flex-end mod-bold> Voeg toe </vl-link>
-      </vl-column>
-    </vl-grid>
-  </vl-info-tile>
+  <span v-vl-spacer:bottom>
+    <vl-info-tile
+      style="word-break: break-word"
+      class="hvr-grow-shadow spacer"
+      id="search-result"
+      tag-name="div"
+      :title="title"
+      :subtitle="showUrl === true ? url : ''"
+      v-vl-border
+    >
+      <vl-grid>
+        <vl-column>
+          <p>{{ description }}</p>
+        </vl-column>
+        <vl-column>
+          <vl-link id="addLink" v-vl-flex v-vl-flex:align-flex-end mod-bold> Voeg toe </vl-link>
+        </vl-column>
+      </vl-grid>
+    </vl-info-tile>
+  </span>
 </template>
 
 <script lang="ts">
@@ -59,6 +61,10 @@ export default Vue.extend({
 
 #addLink {
   cursor: pointer;
+}
+
+.spacer {
+  margin-bottom: 0.5em;
 }
 
 .hvr-grow-shadow {

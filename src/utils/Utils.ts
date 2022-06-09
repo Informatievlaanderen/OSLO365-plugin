@@ -12,6 +12,15 @@ export function error(text: string) {
   console.error(text);
 }
 
+export function getDayDifference(updateTimestamp: string) {
+  const updateDate = new Date(updateTimestamp);
+  const currentDate = new Date(Date.now());
+
+  const msInDay = 24 * 60 * 60 * 1000;
+
+  return Math.round(Math.abs(currentDate.getTime() - updateDate.getTime()) / msInDay);
+}
+
 /** Click handler for button to insert a foot- or and endnote in the Word doc */
 export async function onInsertNoteClicked(data: any, which: string) {
   return Word.run(async function (context) {

@@ -18,16 +18,18 @@
         <vl-column width="6" v-if="result.length > 0">
           <vl-checkbox v-model="showUrl" id="showUrlCheckbox" name="showUrlCheckbox" mod-switch>Toon URL</vl-checkbox>
         </vl-column>
-        <vl-column width="12" v-for="(hit, index) of result" :key="`${hit.reference}-${index}`">
-          <search-result-card
-            :value="hit"
-            :id="`radio-tile-${index}`"
-            :title="hit.label"
-            :description="hit.description"
-            :url="hit.reference"
-            :showUrl="showUrl"
-          />
-        </vl-column>
+        <div id="ResultBox">
+          <vl-column width="12" v-for="(hit, index) of result" :key="`${hit.reference}-${index}`">
+            <search-result-card
+              :value="hit"
+              :id="`radio-tile-${index}`"
+              :title="hit.label"
+              :description="hit.description"
+              :url="hit.reference"
+              :showUrl="showUrl"
+            />
+          </vl-column>
+        </div>
       </vl-grid>
     </vl-layout>
     <content-footer v-if="result.length > 0" />

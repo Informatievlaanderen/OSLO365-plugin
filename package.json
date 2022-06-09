@@ -43,6 +43,7 @@
     "@govflanders/vl-ui-vue-components": "^12.0.0",
     "core-js": "^3.9.1",
     "css-loader": "^6.5.1",
+    "localforage": "^1.10.0",
     "node-sass": "^7.0.1",
     "regenerator-runtime": "^0.13.7",
     "sass": "^1.48.0",
