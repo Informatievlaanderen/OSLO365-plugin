@@ -2,7 +2,7 @@
   <vl-content-footer id="content-footer">
     <vl-layout>
       Invoegen als
-      <vl-select mod-small>
+      <vl-select v-model="selected" mod-small>
         <option value="footnote">Voetnoot</option>
         <option value="endnote">Eindnoot</option>
       </vl-select>
@@ -19,7 +19,8 @@ import { IOsloItem } from "src/oslo/IOsloItem";
 export default Vue.extend({
   data: () => {
     return {
-      radioTile: {} as IOsloItem
+      radioTile: {} as IOsloItem,
+      selected: 'footnote'
     };
   },
   methods: {

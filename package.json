@@ -27,8 +27,10 @@
   },
   "dependencies": {
     "@govflanders/vl-ui-action-group": "^11.0.0",
+    "@govflanders/vl-ui-checkbox": "^13.0.9",
     "@govflanders/vl-ui-content-footer": "^11.0.0",
     "@govflanders/vl-ui-core": "^12.0.0",
+    "@govflanders/vl-ui-info-tile": "^13.0.9",
     "@govflanders/vl-ui-input-field": "^11.0.0",
     "@govflanders/vl-ui-introduction": "^11.0.0",
     "@govflanders/vl-ui-loader": "^11.0.7",

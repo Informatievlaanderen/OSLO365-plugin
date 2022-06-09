@@ -12,21 +12,21 @@
             placeholder="Geef minstens 3 letters in"
           />
         </vl-column>
-        <vl-column v-if="result.length > 0">
-          <p>{{ result.length }} resultaten gevonden</p>
+        <vl-column width="6" v-if="result.length > 0">
+          <vl-title tag-name="h5">{{ result.length }} resultaten</vl-title>
         </vl-column>
-        <vl-column id="ResultBox" v-if="result.length > 0">
-          <transition-group appear name="slide-fade">
-            <search-result-card
-              v-for="(hit, index) of result"
-              :key="`${hit.reference}-${index}`"
-              :value="hit"
-              :id="`radio-tile-${index}`"
-              :title="hit.label"
-              :description="hit.description"
-              :url="hit.reference"
-            />
-          </transition-group>
+        <vl-column width="6" v-if="result.length > 0">
+          <vl-checkbox v-model="showUrl" id="showUrlCheckbox" name="showUrlCheckbox" mod-switch>Toon URL</vl-checkbox>
+        </vl-column>
+        <vl-column width="12" v-for="(hit, index) of result" :key="`${hit.reference}-${index}`">
+          <search-result-card
+            :value="hit"
+            :id="`radio-tile-${index}`"
+            :title="hit.label"
+            :description="hit.description"
+            :url="hit.reference"
+            :showUrl="showUrl"
+          />
         </vl-column>
       </vl-grid>
     </vl-layout>
@@ -49,7 +49,8 @@ export default Vue.extend({
     return {
       input: "",
       result: [] as IOsloItem[],
-      show: false
+      show: false,
+      showUrl: false
     };
   },
   methods: {
