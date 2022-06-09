@@ -16,7 +16,7 @@
     <loader v-if="status === ScanningStatus.Scanning" />
 
     <vl-grid mod-stacked v-if="status === ScanningStatus.DoneScanning">
-      <result-page :results="results" />
+      <scan-result-page :results="results" />
     </vl-grid>
   </vl-layout>
 </template>
@@ -27,7 +27,7 @@ import { searchDocument, getDefinitions, selectWordInDocument } from "../auto-ch
 import searchResultCard from "../../../general-components/search-result-card/search-result-card.vue";
 import contentFooter from "../components/content-footer-auto-check-pane.vue";
 import loader from "../components/loader.vue";
-import resultPage from "./ResultPage.vue";
+import scanResultPage from "./ScanResultPage.vue";
 import { IOsloItem } from "../../../oslo/IOsloItem";
 
 export enum ScanningStatus {
@@ -38,7 +38,7 @@ export enum ScanningStatus {
 
 export default Vue.extend({
   name: "root",
-  components: { searchResultCard, contentFooter, loader, resultPage },
+  components: { searchResultCard, contentFooter, loader, scanResultPage },
   data: () => {
     return {
       ScanningStatus,

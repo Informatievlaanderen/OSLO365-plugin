@@ -10,7 +10,7 @@
     </vl-column>
     <vl-column>
       <search-result-card
-        v-for="(hit, index) of termDefinitions"
+        v-for="(hit, index) of definitions"
         :key="`${hit.reference}-${index}`"
         :value="hit"
         :id="`radio-tile-${index}`"
@@ -24,9 +24,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { getDefinitions } from "../auto-check";
 import searchResultCard from "../../../general-components/search-result-card/search-result-card.vue";
 import EventBus from "../../../utils/EventBus";
+import { IOsloItem } from "../../../oslo/IOsloItem";
 
 export default Vue.extend({
   components: { searchResultCard },
@@ -36,18 +36,20 @@ export default Vue.extend({
       default: ""
     }
   },
+  data() {
+    return {
+      definitions: [] as IOsloItem[]
+    };
+  },
   methods: {
     resetTerm() {
       EventBus.$emit("resetTerm");
     }
   },
-  computed: {
-    termDefinitions() {
-      console.log(this.term);
-      const test = getDefinitions(this.term);
-      console.log(test);
-      return getDefinitions(this.term);
-    }
+  mounted() {
+    EventBus.$on("definitions", (data: IOsloItem[]) => {
+      this.definitions = data;
+    });
   }
 });
 </script>

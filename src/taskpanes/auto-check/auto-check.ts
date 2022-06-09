@@ -24,9 +24,6 @@ Office.onReady((info) => {
       render: (h) => h(root),
     });
   }
-
-  // TODO: Use VUEX Store, so that not every pane has to initialize it
-  //OsloCache.init();
 });
 
 export async function searchDocument() {
@@ -37,7 +34,7 @@ export async function searchDocument() {
     range.load();
     await context.sync();
 
-    const osloInstance = OsloCache.getInstance();
+    const osloInstance = await OsloCache.getInstance();
 
     let paragraph = range.paragraphs.getFirstOrNullObject();
     paragraph.load();
@@ -89,8 +86,8 @@ export async function searchDocument() {
   });
 }
 
-export function getDefinitions(word: string): IOsloItem[] {
-  return OsloCache.getInstance().osloLookup(word, false);
+export async function getDefinitions(word: string): Promise<IOsloItem[]> {
+  return (await OsloCache.getInstance()).osloLookup(word, false);
 }
 
 // This function expected the cursor to be at the beginning of the document

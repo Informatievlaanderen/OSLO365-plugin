@@ -5,14 +5,7 @@
         <vl-title tag-name="h2">Volgende woorden hebben één of meerdere definities in OSLO:</vl-title>
       </vl-column>
       <vl-column v-for="(term, index) in Array.from(results.keys())" :key="index">
-        <vl-button
-          class="hover-underline-animation"
-          id="termButton"
-          @click="onTermClicked(term)"
-          v-vl-border
-          :value="term"
-          >{{ term }}</vl-button
-        >
+        <scan-result-card :value="term" />
       </vl-column>
     </vl-grid>
 
@@ -24,9 +17,10 @@
 import Vue from "vue";
 import EventBus from "../../../utils/EventBus";
 import DefinitionsPage from "./DefinitionsPage.vue";
+import ScanResultCard from "../components/scan-result-card.vue";
 
 export default Vue.extend({
-  components: { DefinitionsPage },
+  components: { DefinitionsPage, ScanResultCard },
   props: {
     results: {
       type: Map,
@@ -39,13 +33,14 @@ export default Vue.extend({
     };
   },
   methods: {
-    onTermClicked(value: string) {
-      this.selectedTerm = value;
-    }
   },
   mounted() {
     EventBus.$on("resetTerm", () => {
       this.selectedTerm = "";
+    });
+
+    EventBus.$on("showDefinitions", (name: string) => {
+      this.selectedTerm = name;
     });
   }
 });
